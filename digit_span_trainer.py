@@ -90,16 +90,16 @@ def train():
         number_1 = str(row)
         number_2 = str(col)
         number_to_sound = {
-            "0": "null",
-            "1": "yks",
-            "2": "kaks",
-            "3": "kolm",
-            "4": "neli",
-            "5": "viis",
-            "6": "kuus",
-            "7": "seitse",
-            "8": "kaheksa",
-            "9": "yheksa"
+            "0": "0",
+            "1": "1",
+            "2": "2",
+            "3": "3",
+            "4": "4",
+            "5": "5",
+            "6": "6",
+            "7": "7",
+            "8": "8",
+            "9": "9"
         }
         number_text_1 = number_to_sound.get(number_1, "null")
         number_text_2 = number_to_sound.get(number_2, "null")

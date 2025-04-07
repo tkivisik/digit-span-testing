@@ -1,10 +1,27 @@
-# Import necessary librariesthem
 import random
 import time
+import datetime
 import pygame
 import os
 import pandas as pd
-import keyboard
+
+from mutagen.mp3 import MP3
+
+trunks = [0,1,2,3,4,5,6,7,8,9]
+
+def get_mp3_duration(filepath):
+    audio = MP3(filepath)
+    return audio.info.length
+
+def get_sound_durations(sound_model):
+    sound_durations = {}
+
+    for i, trunk in enumerate(trunks):
+        filepath = os.path.join("Soundmodels", sound_model, "{}.mp3".format(trunk))
+        sound_duration = get_mp3_duration(filepath)
+        sound_durations[i] = sound_duration
+
+    return sound_durations
 
 # Set working directory
 abspath = os.path.abspath(__file__)
@@ -18,41 +35,45 @@ if not os.path.exists('Feedback'):
     os.makedirs('Feedback')
 
 
-# Define functions
+def is_valid(seq):
+    if len(seq) < 3:
+        return True
+    a, b, c = seq[-3], seq[-2], seq[-1]
+    # Check for three same digits
+    if a == b == c:
+        return False
+    # Check for increasing sequence
+    if a + 1 == b and b + 1 == c:
+        return False
+    # Check for decreasing sequence
+    if a - 1 == b and b - 1 == c:
+        return False
+    return True
 
 def generate_numbers_list(n):
+    allowed_digits = range(10)
     numbers_list = []
     for i in range(n):
-        numbers_list.append(random.randint(0, 9))
+        candidates = list(allowed_digits)
+        random.shuffle(candidates)
+        for candidate_digit in candidates:
+            # enforce restrictions to allowed digit sequences
+            if is_valid(numbers_list + [candidate_digit]):
+                numbers_list.append(candidate_digit)
+                break
+            else:
+                # If no valid candidate_digit found, backtrack one step
+                if numbers_list:
+                    numbers_list.pop()
+                else:
+                    raise ValueError("Cannot generate valid numbers_list from scratch.")
     return numbers_list
 
 
 def play_audio(number, sound_model):
     pygame.mixer.init()
-    # set file path
-    path = 'Soundmodels/' + str(sound_model) + '/'
-    # get file name
-    if number == 0:
-        pygame.mixer.music.load(path + 'null.mp3')
-    elif number == 1:
-        pygame.mixer.music.load(path + 'yks.mp3')
-    elif number == 2:
-        pygame.mixer.music.load(path + 'kaks.mp3')
-    elif number == 3:
-        pygame.mixer.music.load(path + 'kolm.mp3')
-    elif number == 4:
-        pygame.mixer.music.load(path + 'neli.mp3')
-    elif number == 5:
-        pygame.mixer.music.load(path + 'viis.mp3')
-    elif number == 6:
-        pygame.mixer.music.load(path + 'kuus.mp3')
-    elif number == 7:
-        pygame.mixer.music.load(path + 'seitse.mp3')
-    elif number == 8:
-        pygame.mixer.music.load(path + 'kaheksa.mp3')
-    elif number == 9:
-        pygame.mixer.music.load(path + 'yheksa.mp3')
-    
+    path = os.path.join('Soundmodels', str(sound_model), "{}.mp3".format(number))
+    pygame.mixer.music.load(path)    
     pygame.mixer.music.play()
     while pygame.mixer.music.get_busy():
             pygame.time.Clock().tick(10)
@@ -72,25 +93,24 @@ print()
 name = input('Please enter your name ---> ')
 os.system('cls||clear')
 
-# Get current date
-current_date = time.strftime("%d/%m/%Y")
+current_date = datetime.date.today().isoformat()
 
 # ask for user's conditions
 
 # Practice or testing mode, practice 1, test 2
 while True:
-    print('Please choose mode:')
+    print('Palun vali sisu - Please choose mode:')
     print()
-    print('1. Practice')
-    print('2. Test')
-    print('3. Baastest (Benchmark)')
+    print('1. Harjutamin - Practice')
+    print('2. Jätkutest - Test')
+    print('3. Baastest - Benchmark')
     print()
-    print('* enter a number *')
+    print('* sisesta number - enter a number *')
     mode = input('---> ')
     if mode in {'1', '2', '3'}:
         break
     else:
-        print("Please enter a valid option.")
+        print("Palun kasuta lubatud valikuid - Please enter a valid option.")
         os.system('cls||clear')
 os.system('cls||clear')
 
@@ -179,15 +199,16 @@ os.system('cls||clear')
 
 # Ask for sound model and ensure it is a valid option
 while True:
-    print('Please enter sound model number:')
+    print('Palun vali häälemudel - Please enter sound model number:')
     print()
-    print('1. Kaarel(Estonian)')
-    print('2. Pille(Estonian)')
-    print('3. Bot(English)')
+    print('1. Kaarel (Estonian)')
+    print('2. Pille (Estonian)')
+    print('3. Bot (English)')
     print()
     print('* enter a number *')
     sound_model = input(' ---> ')
     if sound_model in {'1', '2', '3'}:
+        sound_durations = get_sound_durations(sound_model)
         break
     else:
         print("Please enter a valid option.")
@@ -198,7 +219,7 @@ os.system('cls||clear')
 if mode == '1':
     wait_time = float(input('Please enter wait time between numbers in seconds ---> '))
 elif mode == '2' or mode == '3':
-    wait_time = 0
+    wait_time = 1
 os.system('cls||clear')
 
 # ask for memory method, 1 - no method, 2 - memory palace
@@ -242,8 +263,8 @@ input()
 os.system('cls||clear')
 
 # Check if log file exists
-if os.path.isfile('Logs/' + name + '_digit_span_log.csv'):
-    df = pd.read_csv('Logs/' + name + '_digit_span_log.csv')
+if os.path.isfile(os.path.join('Logs', '{}_digit_span_log.csv'.format(name))):
+    df = pd.read_csv(os.path.join('Logs','{}_digit_span_log.csv'.format(name)))
     session_nr = df['session_nr'].iloc[-1] + 1
 else:
     df = pd.DataFrame(columns=['user_name', 'date', 'time', 'session_nr', 'loop_nr', 'presented_sequence', 'recalled_sequence', 'outcome', 'mistakes_in_a_row',
@@ -267,22 +288,20 @@ while status:
     numbers_list = generate_numbers_list(n)
     presented_sequence = ''.join(str(number) for number in numbers_list)
     presented_sequence = str(presented_sequence)
-
-    # Disable keyboard using import keyboard
-    for i in range(150):
-        keyboard.block_key(i)
     
     # Play audio for all numbers in the list
     for number in numbers_list:
+        os.system('cls||clear')
         play_audio(number, sound_model)
-        time.sleep(wait_time)
+        os.system('cls||clear')
+        sound_duration = sound_durations[number]
+        adjusted_wait_time = max(0, wait_time - sound_duration)
+        time.sleep(adjusted_wait_time)
+
+    os.system('cls||clear')
 
     # Measure time
     loop_input_start_time = time.time()
-
-    # Enable keyboard
-    for i in range(150):
-        keyboard.unblock_key(i)
     
     # Ask user to repeat numbers
     print('Current number length is ' + str(current_loop_n) + ' numbers.')
@@ -354,7 +373,7 @@ while status:
             input()
             os.system('cls||clear')
             status = False
-            df.to_csv('Logs/' + name + '_digit_span_log.csv', index=False)
+            df.to_csv(os.path.join('Logs', '{}_digit_span_log.csv'.format(name)), index=False)
         else:
             print('Press ENTER to continue')
             input()
@@ -377,10 +396,11 @@ while status:
             if feedback != '':
                 #generate datetime parameter yyyymmdd_hhmmss
                 feedback_datetime = time.strftime("%Y%m%d_%H%M%S")
-                with open('Feedback/feedback_' + name + '_' + str(feedback_datetime) + '.txt', 'w') as f:
+                filepath = os.path.join('Feedback', 'feedback_{}_{}.txt'.format(name, feedback_datetime)) 
+                with open(filepath, 'w') as f:
                     f.write(feedback)
             status = False
             print('Thank you for playing!')
             # print elapsed time in hours, miutes and seconds
             print('Total time elapsed: ' + time.strftime("%H:%M:%S", time.gmtime(time.time() - total_time_start)))
-            df.to_csv('Logs/' + name + '_digit_span_log.csv', index=False)
+            df.to_csv(os.path.join('Logs', '{}_digit_span_log.csv'.format(name)), index=False)
