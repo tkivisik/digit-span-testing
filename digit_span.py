@@ -28,7 +28,7 @@ abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
-# check if there are Logs and Feedback folders, if not then create them
+# Create directories, if missing
 if not os.path.exists('Logs'):
     os.makedirs('Logs')
 if not os.path.exists('Feedback'):
@@ -101,7 +101,7 @@ current_date = datetime.date.today().isoformat()
 while True:
     print('Palun vali sisu - Please choose mode:')
     print()
-    print('1. Harjutamin - Practice')
+    print('1. Harjutamine - Practice')
     print('2. Jätkutest - Test')
     print('3. Baastest - Benchmark')
     print()
@@ -328,6 +328,7 @@ while status:
         mistakes_in_a_row += 1
         if mistakes_in_a_row > 1:
             n -= 1
+            n = max(1, n)
 
     # calculate total session time in hours, minutes and seconds
     session_time = time.strftime("%H:%M:%S", time.gmtime(time.time() - total_time_start))
