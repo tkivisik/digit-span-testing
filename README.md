@@ -1,6 +1,6 @@
 # Digit Span Testing
 
-This repository is for Digit Span testing and training, as well as training the phonetic number system in Estonian. It was initially developed for the Artificial and Natural Intelligence (ANI) course at the University of Tartu.
+This repository is for Digit Span testing and training (in Estonian and in English), as well as training the phonetic number system in Estonian. It was initially developed for the Artificial and Natural Intelligence (ANI) course at the University of Tartu.
 
 ## Digit Span testing
 
@@ -19,6 +19,10 @@ The program includes functionality to train mapping digit sequences to correspon
 ## About
 
 This project was initially created as part of the Artificial and Natural Intelligence couse at the University of Tartu. In 2023, initial code was contributed by Tamur Talviku, Gregor Nepste, Kirill Jurkov, Madis Peterson, Kristjan Solmann. In 2024, Matthias Reima contributed parts. The project has been supervised by Taavi Kivisik.
+
+## Contributions
+
+Contributions are welcome. Anyone making a pull request agrees to allow their contribution to be licenced under the same licence as the rest of the code in this repository.
 
 # References
 
