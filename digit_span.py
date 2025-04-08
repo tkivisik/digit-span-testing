@@ -95,6 +95,10 @@ os.system('cls||clear')
 
 current_date = datetime.date.today().isoformat()
 
+mode_int_to_word = {"1": "PRACTICE",
+                    "2": "TEST",
+                    "3": "BENCHMARK"}
+
 # ask for user's conditions
 
 # Practice or testing mode, practice 1, test 2
@@ -106,8 +110,8 @@ while True:
     print('3. Baastest - Benchmark')
     print()
     print('* sisesta number - enter a number *')
-    mode = input('---> ')
-    if mode in {'1', '2', '3'}:
+    mode_input = input('---> ')
+    if mode_input in mode_int_to_word.keys():
         break
     else:
         print("Palun kasuta lubatud valikuid - Please enter a valid option.")
@@ -176,8 +180,8 @@ while True:
         os.system('cls||clear')
 os.system('cls||clear')
 
-# Ask for starting n and ensure it is a number
-if mode == '3':
+# Initialize starting sequence length
+if mode_int_to_word[mode_input] == 'BENCHMARK':
     n = 3
 else:
     while True:
@@ -216,14 +220,14 @@ while True:
 os.system('cls||clear')
 
 # ask for wait time between numbers'
-if mode == '1':
+if mode_int_to_word[mode_input] == 'PRACTICE':
     wait_time = float(input('Please enter wait time between numbers in seconds ---> '))
-elif mode == '2' or mode == '3':
+elif mode_int_to_word[mode_input] == 'TRAIN' or mode_int_to_word[mode_input] == 'BENCHMARK':
     wait_time = 1
 os.system('cls||clear')
 
 # ask for memory method, 1 - no method, 2 - memory palace
-if mode == '3':
+if mode_int_to_word[mode_input] == 'BENCHMARK':
     memory_method = '11'
 else:
     while True:
@@ -334,7 +338,7 @@ while status:
     session_time = time.strftime("%H:%M:%S", time.gmtime(time.time() - total_time_start))
     
     # ask for feedback
-    if mode != '3':
+    if mode_input != '3':
         print('Press ENTER to continue or leave feedback by typing now!')
         print()
         feedback = input(' ---> ')
@@ -346,7 +350,7 @@ while status:
     data = {'user_name': name, 'date': current_date, 'time': time.strftime("%H:%M:%S"), 'session_nr': session_nr, 'loop_nr': loop_nr, 'presented_sequence': presented_sequence,
             'recalled_sequence': recalled_sequence, 'outcome': outcome, 'mistakes_in_a_row': mistakes_in_a_row, 'recall_time_in_s': time_taken_loop_input, 'sound_model': sound_model,
             'digit_length': current_loop_n, 'session_time': session_time, 'time_between_digits': wait_time, 'memory_method': memory_method, 'tiredness': tiredness,
-            'physical_activity': physical_activity, 'mental_state': mental_state, 'location': location, 'motivation': motivation, 'session_mode': mode, 'feedback': feedback}
+            'physical_activity': physical_activity, 'mental_state': mental_state, 'location': location, 'motivation': motivation, 'session_mode': mode_int_to_word[mode_input], 'feedback': feedback}
 
     # Add data to dataframe
     df = pd.concat([df, pd.DataFrame(data, index=[0])], ignore_index=True)
@@ -364,17 +368,16 @@ while status:
 
     # Clear screen and wait for user input
     
-    # if benchmark mode
-    if mode == '3':
+    if mode_int_to_word[mode_input] == 'BENCHMARK':
         if benchmark_test_loop_nr == 14:
             os.system('cls||clear')
+            df.to_csv(os.path.join('Logs', '{}_digit_span_log.csv'.format(name)), index=False)
             print('You have reached the end of benchmark test.')
             print()
             print('Press ENTER to continue')
             input()
             os.system('cls||clear')
             status = False
-            df.to_csv(os.path.join('Logs', '{}_digit_span_log.csv'.format(name)), index=False)
         else:
             print('Press ENTER to continue')
             input()
@@ -388,6 +391,7 @@ while status:
         user_input = input(' ---> ')
         os.system('cls||clear')
         if user_input.lower() == 'quit':
+            df.to_csv(os.path.join('Logs', '{}_digit_span_log.csv'.format(name)), index=False)
             print('Please summarize your experience!')
             print()
             print('(ENTER for skip)')
@@ -404,4 +408,3 @@ while status:
             print('Thank you for playing!')
             # print elapsed time in hours, miutes and seconds
             print('Total time elapsed: ' + time.strftime("%H:%M:%S", time.gmtime(time.time() - total_time_start)))
-            df.to_csv(os.path.join('Logs', '{}_digit_span_log.csv'.format(name)), index=False)
