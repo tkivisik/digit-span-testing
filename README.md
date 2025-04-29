@@ -24,6 +24,11 @@ python3 digit_span.py
 
 Artificial and Natural Intelligence (ANI) course has offered group projects where participants train their Digit Span across 25 days, 1 hour each day. This is inspired by Chase and Ericsson (1982), where SF increased his digit span from 7 to over 80 through practice.
 
+```
+# run
+python3 mnemonic_training.py
+```
+
 ## Mnemonic training - Estonian phonetic number system
 
 The program includes functionality to train mapping digit sequences to corresponding words according to the Estonian phonetic number system. Included digit to letter mapping was created by Taavi Kivisik in 2008.

@@ -7,6 +7,11 @@ import random
 import pygame
 import time
 
+from tkinter import messagebox
+def show_selection():
+    selection = f"You selected: {soundmodel.get()}"
+    messagebox.showinfo("Selection", selection)
+
 pygame.mixer.init()
 
 # Dark theme colors
@@ -20,7 +25,11 @@ data = {}  # Global variable to hold the loaded data
 
 def load_data():
     global data
-    filename = filedialog.askopenfilename(filetypes=[("JSON Files", "*.json")])
+    mappings_directory = os.path.join(".", "mappings_for_training")
+    default_mapping_filename = "taavi_kivisik.json"
+    filename = filedialog.askopenfilename(initialdir=mappings_directory,
+                                          filetypes=[("JSON Files", "*.json")]
+    , initialfile=default_mapping_filename)
     if filename:
         with open(filename, "r") as file:
             data = json.load(file)
@@ -86,7 +95,7 @@ def train():
         current_number.set(number)
         
         # Translate the number into a sound file name where 1 is yks, 2 is kaks, etc.
-        base_sound_directory = "Soundmodels/3/"
+        base_sound_directory = "soundmodels/{}/".format(soundmodel.get())
         number_1 = str(row)
         number_2 = str(col)
         number_to_sound = {
@@ -209,6 +218,39 @@ scale.grid(row=15, column=5, columnspan=10, padx=0, pady=0)
 # Add label for slider in small italic font
 scale_label = tk.Label(root, text="Delay (s) after sound before showing answer", bg=bg_color, fg=fg_color, font=("Helvetica", 10))
 scale_label.grid(row=16, column=5, columnspan=10, padx=0, pady=0)
+
+# # Create a slider for soundmodel
+soundmodel = tk.StringVar(value="3")
+# soundmodel = tk.Scale(root, from_=1, to=3, orient=tk.HORIZONTAL, length=300, bg=bg_color, fg=fg_color, font=button_font)
+# soundmodel.grid(row=16, column=0, columnspan=10, padx=0, pady=0)
+
+# Radio buttons
+radio1 = tk.Radiobutton(root, text="male (EST)", variable=soundmodel, value="1",
+                        bg=bg_color, fg=fg_color, selectcolor=bg_color, font=("Helvetica", 12))
+radio1.grid(row=17, column=5, sticky="w")
+
+radio2 = tk.Radiobutton(root, text="female (EST)", variable=soundmodel, value="2",
+                        bg=bg_color, fg=fg_color, selectcolor=bg_color, font=("Helvetica", 12))
+radio2.grid(row=18, column=5, sticky="w")
+
+radio3 = tk.Radiobutton(root, text="bot (ENG)", variable=soundmodel, value="3",
+                        bg=bg_color, fg=fg_color, selectcolor=bg_color, font=("Helvetica", 12))
+radio3.grid(row=19, column=5, sticky="w")
+
+# Button
+btn = tk.Button(root, text="Show Selection", command=show_selection)
+btn.grid(row=20, column=5, pady=10)
+
+
+
+
+
+
+
+
+
+
+
 
 # Checkbox for showing answer automatically
 show_auto_var = tk.IntVar()
