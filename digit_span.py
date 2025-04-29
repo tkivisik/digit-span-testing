@@ -7,6 +7,10 @@ import pandas as pd
 
 from mutagen.mp3 import MP3
 
+datapath = 'data'
+journalpath = 'journal'
+soundmodelspath = 'soundmodels'
+
 trunks = [0,1,2,3,4,5,6,7,8,9]
 
 def get_mp3_duration(filepath):
@@ -17,7 +21,7 @@ def get_sound_durations(sound_model):
     sound_durations = {}
 
     for i, trunk in enumerate(trunks):
-        filepath = os.path.join("Soundmodels", sound_model, "{}.mp3".format(trunk))
+        filepath = os.path.join(soundmodelspath, sound_model, "{}.mp3".format(trunk))
         sound_duration = get_mp3_duration(filepath)
         sound_durations[i] = sound_duration
 
@@ -29,11 +33,10 @@ dname = os.path.dirname(abspath)
 os.chdir(dname)
 
 # Create directories, if missing
-if not os.path.exists('Logs'):
-    os.makedirs('Logs')
-if not os.path.exists('Feedback'):
-    os.makedirs('Feedback')
-
+if not os.path.exists(datapath):
+    os.makedirs(datapath)
+if not os.path.exists(journalpath):
+    os.makedirs(journalpath)
 
 def is_valid(seq):
     if len(seq) < 3:
@@ -72,7 +75,7 @@ def generate_numbers_list(n):
 
 def play_audio(number, sound_model):
     pygame.mixer.init()
-    path = os.path.join('Soundmodels', str(sound_model), "{}.mp3".format(number))
+    path = os.path.join(soundmodelspath, str(sound_model), "{}.mp3".format(number))
     pygame.mixer.music.load(path)    
     pygame.mixer.music.play()
     while pygame.mixer.music.get_busy():
@@ -95,19 +98,16 @@ os.system('cls||clear')
 
 current_date = datetime.date.today().isoformat()
 
-mode_int_to_word = {"1": "PRACTICE",
-                    "2": "TEST",
-                    "3": "BENCHMARK"}
+mode_int_to_word = {"1": "BENCHMARK",
+                    "2": "PRACTICE",
+                    "3": "TEST"}
 
-# ask for user's conditions
-
-# Practice or testing mode, practice 1, test 2
 while True:
     print('Palun vali sisu - Please choose mode:')
     print()
-    print('1. Harjutamine - Practice')
-    print('2. Jätkutest - Test')
-    print('3. Baastest - Benchmark')
+    print('1. Baastest - Benchmark')
+    print('2. Harjutamine - Practice')
+    print('3. Jätkutest - Test')
     print()
     print('* sisesta number - enter a number *')
     mode_input = input('---> ')
@@ -141,16 +141,6 @@ while True:
         break
     else:
         print("Please enter a valid option.")
-        os.system('cls||clear')
-os.system('cls||clear')
-
-# physical activity minutes
-while True:
-    physical_activity = input('Enter your active minutes for today ---> ')
-    if physical_activity.isdigit():
-        break
-    else:
-        print("Please enter a valid number.")
         os.system('cls||clear')
 os.system('cls||clear')
 
@@ -197,7 +187,6 @@ else:
             break
         else:
             print("Please enter a valid number.")
-            os.system('cls||clear')
         os.system('cls||clear')
 os.system('cls||clear')    
 
@@ -220,36 +209,33 @@ while True:
 os.system('cls||clear')
 
 # ask for wait time between numbers'
+wait_time = 1
 if mode_int_to_word[mode_input] == 'PRACTICE':
     wait_time = float(input('Please enter wait time between numbers in seconds ---> '))
-elif mode_int_to_word[mode_input] == 'TRAIN' or mode_int_to_word[mode_input] == 'BENCHMARK':
+elif mode_int_to_word[mode_input] in ['TEST', 'BENCHMARK']:
+    # world memory championships start saying a new digit at each new second.
     wait_time = 1
 os.system('cls||clear')
 
-# ask for memory method, 1 - no method, 2 - memory palace
-if mode_int_to_word[mode_input] == 'BENCHMARK':
-    memory_method = '11'
-else:
-    while True:
-        print('Please choose memory method that you practiced today.')
-        print()
-        print('Examples: 4, 7, 10 or 6')
-        print()
-        print('1. Repeating the audio')
-        print('2. Visualizing the digits')
-        print('3. Rhyming words with numbers to visualize images')
-        print('4. Translating number shape to images')
-        print('5. Phonetic number system to create images (1 digit at a time)')
-        print('6. Phonetic number system to create images (2 digits at a time)')
-        print('7. Method of Loci')
-        print('8. Using absurd connections')
-        print('9. Number chunking')
-        print('10. Using personal connections')
-        print('11. No method')
-        print()
-        print('* enter a number *')
-        memory_method = input(' ---> ')
-        break
+# Ask about the method that was practiced or used for memorization.
+print('Please choose memory method that you used or practiced today.')
+print()
+print('Examples: 4, 7, 10 or 6')
+print()
+print('1. Repeating the audio')
+print('2. Visualizing the digits')
+print('3. Rhyming words with numbers to visualize images')
+print('4. Translating number shape to images')
+print('5. Phonetic number system to create images (1 digit at a time)')
+print('6. Phonetic number system to create images (2 digits at a time)')
+print('7. Method of Loci')
+print('8. Using absurd connections')
+print('9. Number chunking')
+print('10. Using personal connections')
+print('11. No method')
+print()
+print('* enter a number *')
+memory_method = input(' ---> ')
 
 os.system('cls||clear')
 
@@ -267,8 +253,8 @@ input()
 os.system('cls||clear')
 
 # Check if log file exists
-if os.path.isfile(os.path.join('Logs', '{}_digit_span_log.csv'.format(name))):
-    df = pd.read_csv(os.path.join('Logs','{}_digit_span_log.csv'.format(name)))
+if os.path.isfile(os.path.join(datapath, '{}_digit_span_log.csv'.format(name))):
+    df = pd.read_csv(os.path.join(datapath,'{}_digit_span_log.csv'.format(name)))
     session_nr = df['session_nr'].iloc[-1] + 1
 else:
     df = pd.DataFrame(columns=['user_name', 'date', 'time', 'session_nr', 'loop_nr', 'presented_sequence', 'recalled_sequence', 'outcome', 'mistakes_in_a_row',
@@ -291,18 +277,16 @@ while status:
     # Generate list of numbers
     numbers_list = generate_numbers_list(n)
     presented_sequence = ''.join(str(number) for number in numbers_list)
-    presented_sequence = str(presented_sequence)
     
     # Play audio for all numbers in the list
     for number in numbers_list:
         os.system('cls||clear')
         play_audio(number, sound_model)
-        os.system('cls||clear')
         sound_duration = sound_durations[number]
         adjusted_wait_time = max(0, wait_time - sound_duration)
         time.sleep(adjusted_wait_time)
 
-    os.system('cls||clear')
+    # os.system('cls||clear')
 
     # Measure time
     loop_input_start_time = time.time()
@@ -313,6 +297,7 @@ while status:
     print('Please repeat the numbers in one line')
     print()
     recalled_sequence = str(input(' ---> '))
+    recalled_sequence_digits_only = ''.join([ch for ch in recalled_sequence if ch.isdigit()])
     os.system('cls||clear')
     
 
@@ -321,7 +306,7 @@ while status:
     time_taken_loop_input = loop_input_end_time - loop_input_start_time
 
     # Check if user repeated numbers correctly
-    if recalled_sequence == presented_sequence:
+    if recalled_sequence_digits_only == presented_sequence:
         outcome = 'correct'
         print('Correct!')
         n += 1
@@ -339,20 +324,20 @@ while status:
     # calculate total session time in hours, minutes and seconds
     session_time = time.strftime("%H:%M:%S", time.gmtime(time.time() - total_time_start))
     
-    # ask for feedback
-    if mode_input != '3':
-        print('Press ENTER to continue or leave feedback by typing now!')
+    # ask for a journal entry
+    if mode_int_to_word[mode_input] != 'BENCHMARK':
+        print('Press ENTER to continue or write a comment about memorizing the previous sequence!')
         print()
-        feedback = input(' ---> ')
+        trial_comment = input(' ---> ')
         os.system('cls||clear')
     else:
-        feedback = ''
+        trial_comment = ''
     
     # Compose data
     data = {'user_name': name, 'date': current_date, 'time': time.strftime("%H:%M:%S"), 'session_nr': session_nr, 'loop_nr': loop_nr, 'presented_sequence': presented_sequence,
             'recalled_sequence': recalled_sequence, 'outcome': outcome, 'mistakes_in_a_row': mistakes_in_a_row, 'recall_time_in_s': time_taken_loop_input, 'sound_model': sound_model,
             'digit_length': current_loop_n, 'session_time': session_time, 'time_between_digits': wait_time, 'memory_method': memory_method, 'tiredness': tiredness,
-            'physical_activity': physical_activity, 'mental_state': mental_state, 'location': location, 'motivation': motivation, 'session_mode': mode_int_to_word[mode_input], 'feedback': feedback}
+            'mental_state': mental_state, 'location': location, 'motivation': motivation, 'session_mode': mode_int_to_word[mode_input], 'trial_comment': trial_comment}
 
     # Add data to dataframe
     df = pd.concat([df, pd.DataFrame(data, index=[0])], ignore_index=True)
@@ -364,7 +349,7 @@ while status:
     print('Total time elapsed from start: ' + time.strftime("%H:%M:%S", time.gmtime(time.time() - total_time_start)))
     # print current loop number and length of series
     print()
-    print('This was round number ' + str(loop_nr))
+    print('This was trial number ' + str(loop_nr))
     print('Next digit length: ' + str(n))
     print('__________________________')
 
@@ -373,7 +358,7 @@ while status:
     if mode_int_to_word[mode_input] == 'BENCHMARK':
         if benchmark_test_loop_nr == 14:
             os.system('cls||clear')
-            df.to_csv(os.path.join('Logs', '{}_digit_span_log.csv'.format(name)), index=False)
+            df.to_csv(os.path.join(datapath, '{}_digit_span_log.csv'.format(name)), index=False)
             print('You have reached the end of benchmark test.')
             print()
             print('Press ENTER to continue')
@@ -393,20 +378,21 @@ while status:
         user_input = input(' ---> ')
         os.system('cls||clear')
         if user_input.lower() == 'quit':
-            df.to_csv(os.path.join('Logs', '{}_digit_span_log.csv'.format(name)), index=False)
-            print('Please summarize your experience!')
+            df.to_csv(os.path.join(datapath, '{}_digit_span_log.csv'.format(name)), index=False)
+            print('''OPTIONAL.
+                  Please summarize your experience in this testing session (across trials)!''')
             print()
-            print('(ENTER for skip)')
+            print('(press ENTER to skip)')
             print()
-            feedback = input(' ---> ')
-            # save feedback as a text file with session number, user name and date and time as object
-            if feedback != '':
+            journal_entry = input(' ---> ')
+            # save journal_entry as a text file with session number, user name and date and time as object
+            if journal_entry != '':
                 #generate datetime parameter yyyymmdd_hhmmss
-                feedback_datetime = time.strftime("%Y%m%d_%H%M%S")
-                filepath = os.path.join('Feedback', 'feedback_{}_{}.txt'.format(name, feedback_datetime)) 
+                journal_entry_datetime = time.strftime("%Y%m%d_%H%M%S")
+                filepath = os.path.join(journalpath, '{}_journal_{}.txt'.format(name, journal_entry_datetime)) 
                 with open(filepath, 'w') as f:
-                    f.write(feedback)
+                    f.write(journal_entry)
             status = False
             print('Thank you for playing!')
-            # print elapsed time in hours, miutes and seconds
-            print('Total time elapsed: ' + time.strftime("%H:%M:%S", time.gmtime(time.time() - total_time_start)))
+            time_elapsed = time.strftime("%H:%M:%S", time.gmtime(time.time() - total_time_start))
+            print('Total time elapsed: ' + time_elapsed)

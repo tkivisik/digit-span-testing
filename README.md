@@ -8,6 +8,18 @@ Digit span is a common measure of working memory and short term memory. Current 
 
 This program allows to measure it using a method described by Woods and colleagues (2011), where participants go through 14 trials, beginning with 3 digits for Forward Span (FS). Correcly recalling a sequence increases the length of the next sequence by one. Incorrectly recalling two consecutive sequences reduces the length of the next sequence by one.
 
+```
+# optional - create and activate a virtual environment
+python3 -m venv .venv
+source venv/bin/activate
+
+# install requirements
+pip install -r requirements.txt
+
+# run
+python3 digit_span.py
+```
+
 ## Digit Span training
 
 Artificial and Natural Intelligence (ANI) course has offered group projects where participants train their Digit Span across 25 days, 1 hour each day. This is inspired by Chase and Ericsson (1982), where SF increased his digit span from 7 to over 80 through practice.
